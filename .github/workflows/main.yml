@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - 'terraform-project/**'  # Only run if files under charts/ change
+      - 'grafana/**'  # Only run if files under charts/ change
 permissions:
   security-events: write
 jobs:
