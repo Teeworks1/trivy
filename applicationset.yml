@@ -1,0 +1,49 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: ApplicationSet
+# metadata:
+#   name: test-applicationset
+#   namespace: argocd
+# spec:
+#   generators:
+#     - list:
+#         elements:
+#           - name: frontend
+#             path: teeworks1/trivy/trivy
+#             namespace: trivy
+#           # - name: backend
+#           #   path: apps/backend
+#           # - name: auth
+#           #   path: apps/auth
+#   template:
+#     metadata:
+#       name: '{{name}}'
+#       namespace: argocd
+#     spec:
+#       project: default
+#       source:
+#         repoURL: https://git@github.com:Teeworks1/trivy.git
+#         targetRevision: HEAD
+#         path: '{{path}}'
+#       destination:
+#         server: https://kubernetes.default.svc
+#         namespace: '{{name}}'
+#       syncPolicy:
+#         automated:
+#           prune: true
+#           selfHeal: true
+
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aquasecurity-trivy
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Teeworks1/trivy.git  # ✅ FIXED HERE
+    targetRevision: HEAD
+    path: .
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: trivy
