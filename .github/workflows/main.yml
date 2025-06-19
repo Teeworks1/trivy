@@ -1,0 +1,37 @@
+name: Trivy Helm Chart Scan (PR)
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform-project/**'  # Only run if files under charts/ change
+permissions:
+  security-events: write
+jobs:
+  trivy-helm-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Find changed chart directories
+        id: changes
+        run: |
+          # Find all chart directories that changed in this PR
+          echo "::group::Detect changed charts"
+          CHANGED_DIRS=$(git diff --name-only origin/main | grep '^charts/' | cut -d/ -f1-2 | sort -u)
+          echo "$CHANGED_DIRS"
+          echo "dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      - name: Scan all changed charts with Trivy
+        uses: aquasecurity/trivy-action@v0.8.0
+        with:
+          scan-type: config
+          scan-ref: charts/your-chart-name-here  # replace or loop for each chart dir
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: 1
+          ignore-unfixed: true
+      - name: Upload scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-results.sarif
