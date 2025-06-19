@@ -1,0 +1,73 @@
+useConfigMap: true
+createConfigMap: true
+replicas: 2
+adminUser: "admin"
+adminPassword: "strongpassword"
+admin:
+  existingSecret: ""
+  userKey: "admin"
+  passwordKey: "admin-password"
+  secretName: "grafana"
+image:
+  repository: grafana/grafana
+  tag: "11.4.0"
+  sha: ""
+  pullPolicy: IfNotPresent
+useStatefulSet: true
+persistence: 
+  enabled: true
+  storageClassName: default
+  type: pvc
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+autoscaling:
+  enabled: true
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.className: nginx
+    kubernetes.io/tls-acme: "true"
+  labels: {}
+  path: /
+  pathType: Prefix
+  hosts:
+    - chart-example.local
+  extraPaths: null
+  tls: 
+   - secretName: tls-secret
+     hosts:
+       - chart-example.local
+headlessService: true
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  labels:
+    app: grafana
+configData: |
+  apiVersion: 1
+  datasources:
+    - name: Prometheus-ap
+      type: prometheus
+      url: http://prometheus-ap-server.monitoring.svc.cluster.local:80
+      access: proxy
+      isDefault: true
+    - name: Loki-ap
+      type: loki
+      url: http://loki-ap.monitoring.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+env:
+  GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: ""
+  GF_SECURITY_ADMIN_USER: admin
+  GF_SECURITY_ADMIN_PASSWORD: ""
+  GF_SECURITY_ADMIN_PASSWORD__FILE: ""
+ldap:
+  enabled: false
+  existingSecret: ""
+sidecar:
+  dashboards: 
+    enabled: true
+    SCProvider: true
