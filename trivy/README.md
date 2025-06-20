@@ -13,6 +13,7 @@ $ helm install trivy . --namespace trivy --create-namespace
 This chart bootstraps a Trivy deployment on a [Kubernetes](http://kubernetes.io) cluster using the
 [Helm](https://helm.sh) package manager.
 
+
 ## Prerequisites
 
 - Kubernetes 1.12+
